@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  fastapi:
+    build:
+      context: .
+      dockerfile: dockerfile.server
+    container_name: name_server
+    ports:
+      - "8888:8000"
+    networks:
+      - consultant_ai
+    depends_on:
+      - milvus
+
+  milvus:
+    image: milvusdb/milvus
+
+    container_name: milvus_db
+    ports:
+      - "19530:19530"  # Milvus gRPC port
+      - "19121:19121"  # Milvus HTTP port
+    networks:
+      - consultant_ai
+
+networks:
+  consultant_ai:
+    driver: bridge
