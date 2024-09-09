@@ -32,11 +32,11 @@ print("Dim:", sentence_transformer_ef.dim, docs_embeddings_uzbek[0].shape)
 
 # print("Embeddings:", docs_embeddings)
 # print("Dim:", sentence_transformer_ef.dim, docs_embeddings[0].shape)
-
+import os
 
 from pymilvus import MilvusClient
 
-client = MilvusClient(uri="http://localhost:19530")
+client = MilvusClient(uri=os.getenv("MILVUS_URI", "http://localhost:19530"))
 
 if client.has_collection(collection_name="rus_names"):
     client.drop_collection(collection_name="rus_names")

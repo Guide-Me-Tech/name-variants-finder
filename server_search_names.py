@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from pymilvus import MilvusClient
 from pymilvus import model
 from utils.timer import timer
@@ -16,7 +16,11 @@ from utils.convert_between_latin_and_cyril import identify_and_convert
 
 
 @app.get("/search/{name}")
-def search_name(name: str, Limit: int = 10):
+def search_name(request: Request, name: str):
+    try:
+        Limit = int(request.query_params.get("limit", 10))
+    except:
+        Limit = 10
     output = {
         "uzbek_names": [],
         "russian_names": [],
@@ -49,6 +53,8 @@ def search_name(name: str, Limit: int = 10):
             limit=Limit,
             output_fields=["name"],
         )
+        output["uzbek_names"].append({"name": name, "score": 1})
+        output["russian_names"].append({"name": converted_name, "score": 1})
         printred(f"Time taken for search russian : {time.time() - starting_time}")
 
         # printgreen(" ".join([r["entity"]["name"] for r in res]))
@@ -74,6 +80,9 @@ def search_name(name: str, Limit: int = 10):
             limit=Limit,
             output_fields=["name"],
         )
+        output["uzbek_names"].append({"name": converted_name, "score": 1})
+        output["russian_names"].append({"name": name, "score": 1})
+
         printred(f"Time taken for search uzbek: {time.time() - starting_time}")
 
     # printgreen(" ".join([r["entity"]["name"] for r in res]))
@@ -85,6 +94,7 @@ def search_name(name: str, Limit: int = 10):
         output["russian_names"].append(
             {"name": r["entity"]["name"], "score": r["distance"]}
         )
+
     return output
 
 
