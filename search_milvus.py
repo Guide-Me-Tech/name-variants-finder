@@ -1,6 +1,8 @@
 from pymilvus import MilvusClient
 from pymilvus import model
+from dotenv import load_dotenv
 
+load_dotenv()
 sentence_transformer_ef = model.dense.SentenceTransformerEmbeddingFunction(
     model_name="all-MiniLM-L6-v2",  # Specify the model name
     device="cpu",  # Specify the device to use, e.g., 'cpu' or 'cuda:0'

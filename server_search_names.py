@@ -5,10 +5,13 @@ from utils.timer import timer
 from utils.printing import printgreen, printred, printblue
 from utils.embedddigs import MilvusSearch
 import time
+import dotenv
+import os
 
+dotenv.load_dotenv()
 app = FastAPI()
 print("FastAPI app created")
-milvus_client = MilvusSearch(uri="http://localhost:19530")
+milvus_client = MilvusSearch(os.getenv("MILVUS_URI", "http://localhost:19530"))
 print("Milvus client created")
 milvus_client.LoadEmbeddingFunction("all-MiniLM-L6-v2", device="cpu")
 print("Embedding function loaded")
