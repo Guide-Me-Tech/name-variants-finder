@@ -9,7 +9,7 @@ latin_to_russian = {
     "G": "Г",
     "H": "Х",
     "I": "И",
-    "J": "Й",
+    "J": "Ж",
     "K": "К",
     "L": "Л",
     "M": "М",
@@ -24,7 +24,7 @@ latin_to_russian = {
     "V": "В",
     "W": "В",
     "X": "Х",
-    "Y": "Ы",
+    "Y": "Й",
     "Z": "З",
     "a": "а",
     "b": "б",
@@ -77,7 +77,7 @@ russian_to_latin = {
     "У": "U",
     "Ф": "F",
     "Х": "X",
-    "Ц": "TS",
+    "Ц": "S",
     "Ч": "CH",
     "Ш": "SH",
     "Щ": "SH",
@@ -124,6 +124,16 @@ russian_to_latin = {
 
 
 def latin_to_cyrillic(text):
+
+    text = text.replace("ts", "ц")
+    text = text.replace("ch", "ч")
+    text = text.replace("sh", "ш")
+    text = text.replace("yu", "ю")
+    text = text.replace("ya", "я")
+    text = text.replace("yo", "ё")
+    text = text.replace("zh", "ж")
+    text = text.replace("kh", "х")
+
     result = []
     for char in text:
         result.append(latin_to_russian.get(char, char))
@@ -131,6 +141,7 @@ def latin_to_cyrillic(text):
 
 
 def cyrillic_to_latin(text):
+
     result = []
     for char in text:
         result.append(russian_to_latin.get(char, char))
