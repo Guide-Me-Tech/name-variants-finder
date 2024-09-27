@@ -8,7 +8,8 @@ WORKDIR /app
 COPY ./requirements.txt /app/requirements.txt
 
 # Step 4: Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir --upgrade "fastapi[standard]" pymilvus python-dotenv sentence-transformers pymilvus[model]
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Step 5: Copy the FastAPI app code into the container
 COPY . /app
