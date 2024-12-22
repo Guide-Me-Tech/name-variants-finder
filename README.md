@@ -131,16 +131,6 @@ In the realm of natural language processing (NLP) and name-entity handling, it i
 4. **Providing an API** (via FastAPI) to query these embeddings, enabling you to look up matches in real time.  
 5. **Seamless Docker-based deployment** for consistent and reproducible environments.
 
-By the end of reading this README, you should:
-
-- Understand **how the project is structured** and what each directory/file is responsible for.  
-- Gain insight into **how the embedding and retrieval logic** is implemented.  
-- Learn how to **deploy and run** the project locally using Docker or a more manual approach.  
-- Be able to trace data from its raw form in `data_names/` all the way to the API query results you obtain in `server_search_names.py`.  
-- Appreciate how each script ties into the overall pipeline, including optional advanced settings in `embedEtcd.yaml`, `user.yaml`, or `docker-compose.yml`.
-
-This documentation is extremely detailed—over multiple thousands of words—to ensure that a newcomer to the project can understand everything thoroughly.
-
 ---
 
 ## **Project Structure and File Overview**
