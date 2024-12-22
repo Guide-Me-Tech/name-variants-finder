@@ -1,18 +1,45 @@
-# Step 1: Use an official Python runtime as a parent image
+# ------------------------------------------------------------------------------
+# ### Janis Rubins - Step 1: Use an official Python 3.11 image as the base
+# ------------------------------------------------------------------------------
 FROM python:3.11
 
-# Step 2: Set the working directory in the container
+# ------------------------------------------------------------------------------
+# ### Janis Rubins - Step 2: Set environment variables for Python
+# ------------------------------------------------------------------------------
+# Explanation:
+#  - PYTHONDONTWRITEBYTECODE=1 prevents Python from writing .pyc files,
+#    reducing overhead and image size.
+#  - PYTHONUNBUFFERED=1 forces Python to flush stdout/err, ensuring you see
+#    logs in real time in Docker logs.
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+# ------------------------------------------------------------------------------
+# ### Janis Rubins - Step 3: Create a working directory for our application
+# ------------------------------------------------------------------------------
 WORKDIR /app
 
-# Step 3: Copy the requirements.txt file into the container
-COPY ./requirements.txt /app/requirements.txt
-
-# Step 4: Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir --upgrade pip && \
+# ------------------------------------------------------------------------------
+# ### Janis Rubins - Step 4: Copy requirements.txt and install dependencies
+# ------------------------------------------------------------------------------
+# Explanation:
+#  - We echo a message to log the start of the installation step.
+#  - We use --no-cache-dir to reduce image size and avoid caching pip data.
+COPY requirements.txt /app/requirements.txt
+RUN echo "[INFO] Installing Python dependencies..." && \
+    pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Step 5: Copy the FastAPI app code into the container
+# ------------------------------------------------------------------------------
+# ### Janis Rubins - Step 5: Copy the full application code into the container
+# ------------------------------------------------------------------------------
 COPY . /app
-# Step 7: Command to run FastAPI with uvicorn
-ENV PYTHONUNBUFFERED=1
+
+# ------------------------------------------------------------------------------
+# ### Janis Rubins - Step 6: Entrypoint to run the FastAPI app
+# ------------------------------------------------------------------------------
+# Explanation:
+#  - We retain the original logic of running the container using entrypoint.sh.
+#  - The actual logging/error handling for runtime events should happen
+#    within entrypoint.sh or the FastAPI code itself.
 ENTRYPOINT ["sh", "entrypoint.sh"]
