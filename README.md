@@ -14,6 +14,7 @@ link to the swagger: http://127.0.0.1:8000/docs
 
 
 
+```
 .
 ├── .git/                                      # Git metadata (branches, commits, hooks, etc.)
 │   ├── FETCH_HEAD
@@ -77,6 +78,7 @@ link to the swagger: http://127.0.0.1:8000/docs
     │   ├── development.deploy.sh             # Dev version of general deploy script
     │   └── restart.sh                        # Script to restart services
     └── timer.py                               # Decorator or function to measure code execution time
+```
 
 
 
