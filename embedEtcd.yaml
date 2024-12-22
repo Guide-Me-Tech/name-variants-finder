@@ -1,5 +1,49 @@
+# ------------------------------------------------------------------------------
+# ### Janis Rubins - Step 1: Configure the client interface
+# ------------------------------------------------------------------------------
+# Explanation:
+#  - listen-client-urls: The addresses etcd listens on for client traffic.
+#  - advertise-client-urls: The addresses this etcd node advertises to other clients.
 listen-client-urls: http://0.0.0.0:2379
 advertise-client-urls: http://0.0.0.0:2379
+
+# ------------------------------------------------------------------------------
+# ### Janis Rubins - Step 2: Configure logging and debugging
+# ------------------------------------------------------------------------------
+# Explanation:
+#  - log-level: Controls how verbose etcd's logs are (e.g., debug, info, warn).
+#  - logger: The logging framework etcd uses; 'zap' is the recommended modern logger.
+#  - enable-pprof: Enables pprof for performance profiling, so you can track CPU/memory usage.
+log-level: "info"
+logger: "zap"
+enable-pprof: true
+
+# ------------------------------------------------------------------------------
+# ### Janis Rubins - Step 3: Resource usage settings
+# ------------------------------------------------------------------------------
+# Explanation:
+#  - quota-backend-bytes: Maximum size etcd's backend database may grow to.
+#  - auto-compaction-mode & auto-compaction-retention: etcd will automatically
+#    compact old revisions for better performance and resource usage.
 quota-backend-bytes: 4294967296
 auto-compaction-mode: revision
 auto-compaction-retention: '1000'
+
+# ------------------------------------------------------------------------------
+# ### Janis Rubins - Step 4: Network/cluster settings (optional but recommended)
+# ------------------------------------------------------------------------------
+# Explanation:
+#  - These lines configure peer communication among etcd nodes.
+#  - If you run a single-node cluster, they won’t break anything, but might not be used.
+initial-cluster-token: "etcd-cluster"
+initial-advertise-peer-urls: http://0.0.0.0:2380
+listen-peer-urls: http://0.0.0.0:2380
+
+# ------------------------------------------------------------------------------
+# ### Janis Rubins - Step 5: Data directory and additional tuning
+# ------------------------------------------------------------------------------
+# Explanation:
+#  - data-dir: The directory where etcd stores its data.
+#  - enable-v2: Disables legacy etcd v2 API to focus on the modern v3 API.
+data-dir: /etcd-data
+enable-v2: false
