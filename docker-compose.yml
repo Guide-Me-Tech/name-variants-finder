@@ -1,28 +1,120 @@
 version: '3.8'
 
+# ------------------------------------------------------------------------------
+# ### Janis Rubins - Step 1: Declare the Docker Compose version
+# ------------------------------------------------------------------------------
+# Explanation: We specify '3.8' to use a modern Compose file format
+# while maintaining broad compatibility.
 services:
+
+  # ----------------------------------------------------------------------------
+  # ### Janis Rubins - Step 2: Define the FastAPI service
+  # ----------------------------------------------------------------------------
+  # Explanation: This container runs the FastAPI-based server. It is built from
+  # the provided Dockerfile (dockerfile.server). We also configure health checks,
+  # logging, resource constraints, and set a container name.
   fastapi:
     build:
       context: .
       dockerfile: dockerfile.server
+
+    # ### Janis Rubins - Step 2.1: Container naming
     container_name: name_server
+
+    # ### Janis Rubins - Step 2.2: Expose container's port 8000 on host port 8888
     ports:
       - "8888:8000"
+
+    # ### Janis Rubins - Step 2.3: Connect to a custom user-defined bridge network
     networks:
       - consultant_ai
-    depends_on:
-      - milvus
 
+    # ### Janis Rubins - Step 2.4: Wait for milvus container before startup
+    depends_on:
+      milvus:
+        condition: service_healthy
+
+    # ### Janis Rubins - Step 2.5: Health check to ensure FastAPI is running
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+    # ### Janis Rubins - Step 2.6: Optional resource constraints (example)
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '512M'
+        reservations:
+          cpus: '0.5'
+          memory: '256M'
+
+    # ### Janis Rubins - Step 2.7: Configure logging driver and options
+    # Note: 'json-file' is the default driver. You can adjust driver/options as needed.
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # ### Janis Rubins - Step 2.8: Restart policy to keep container running
+    restart: unless-stopped
+
+  # ----------------------------------------------------------------------------
+  # ### Janis Rubins - Step 3: Define the Milvus service
+  # ----------------------------------------------------------------------------
+  # Explanation: Milvus is an open-source vector database for vector similarity search.
   milvus:
     image: milvusdb/milvus
 
+    # ### Janis Rubins - Step 3.1: Container naming
     container_name: milvus_db
+
+    # ### Janis Rubins - Step 3.2: Publish Milvus gRPC and HTTP ports
     ports:
       - "19530:19530"  # Milvus gRPC port
       - "19121:19121"  # Milvus HTTP port
+
+    # ### Janis Rubins - Step 3.3: Connect to the custom network
     networks:
       - consultant_ai
 
+    # ### Janis Rubins - Step 3.4: Health check for Milvus
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "19530"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+    # ### Janis Rubins - Step 3.5: Logging configuration (example)
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # ### Janis Rubins - Step 3.6: Resource constraints (example)
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: '2048M'
+        reservations:
+          cpus: '1'
+          memory: '1024M'
+
+    # ### Janis Rubins - Step 3.7: Restart policy
+    restart: unless-stopped
+
+# ------------------------------------------------------------------------------
+# ### Janis Rubins - Step 4: Define a custom network
+# ------------------------------------------------------------------------------
+# Explanation: Using a custom bridge network allows better control and isolation
+# of these services.
 networks:
   consultant_ai:
     driver: bridge

@@ -1,62 +1,76 @@
-import tensorflow as tf
-
-# from keras.models import Sequential, model_from_json
-# from keras.preprocessing.sequence import pad_sequences
 import os
-
-maxlen = 500
-batch_size = 64
-
-
-# def preprocess_sentence(sss):
-#    test_comments = [sss]
-#    test_comments_category = ["command"]
-#    embedding_name = "sentence_prediction/data/default"
-#    pos_tags_flag = True
-#    x_test, _, y_test, _ = encode_data(
-#        test_comments,
-#        test_comments_category,
-#        data_split=1.0,
-#        embedding_name=embedding_name,
-#        add_pos_tags_flag=pos_tags_flag,
-#    )
-#    x_test = pad_sequences(x_test, maxlen=maxlen)
-#    return x_test
-
-
-import os
-
-# import shutil
-import pandas as pd
-
-import tensorflow as tf
-
-# import tensorflow_hub as hub
-import tensorflow_text as text
-
-# import seaborn as sns
-# from pylab import rcParams
-
-# import matplotlib.pyplot as plt
-tf.get_logger().setLevel("ERROR")
-
-# sns.set(style='whitegrid', palette='muted', font_scale=1.2)
-# HAPPY_COLORS_PALETTE = ["#01BEFE", "#FFDD00", "#FF7D00", "#FF006D", "#ADFF02", "#8F00FF"]
-# sns.set_palette(sns.color_palette(HAPPY_COLORS_PALETTE))
-# rcParams['figure.figsize'] = 12, 8
+import logging
+import time
+import traceback
 import warnings
 
+try:
+    import psutil  # Optional for resource usage
+except ImportError:
+    psutil = None
+
+import tensorflow as tf
+import keras  # for keras.layers.TFSMLayer
+
+# ### Janis Rubins - Step 1: Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+# ### Janis Rubins - Step 2: Suppress TensorFlow and other warnings
+tf.get_logger().setLevel("ERROR")
 warnings.filterwarnings("ignore")
-from sklearn.preprocessing import LabelBinarizer
-import keras
 
+# ### Janis Rubins - Step 3: Define optional resource usage logging
+def log_resource_usage():
+    """
+    Logs CPU and memory usage if psutil is installed.
+    """
+    if psutil:
+        mem_info = psutil.virtual_memory()
+        cpu_percent = psutil.cpu_percent(interval=None)
+        logging.info(
+            f"Resource usage -> Memory: {mem_info.used / (1024 * 1024):.2f} MB / "
+            f"{mem_info.total / (1024 * 1024):.2f} MB, CPU: {cpu_percent:.2f}%"
+        )
+    else:
+        logging.info("psutil not installed; skipping resource usage logging.")
 
+# ### Janis Rubins - Step 4: Define global constants for model usage
+maxlen = 500     # Maximum sequence length (not currently used, retained for compatibility)
+batch_size = 64  # Batch size used in training or inference (not currently used, retained for compatibility)
+
+# ### Janis Rubins - Step 5: Load TensorFlow model function
 def load_model():
-    model = keras.layers.TFSMLayer(
-        "sentence_prediction/trained/tf/saved_model", call_endpoint="serving_default"
-    )
-    # model = tf.keras.models.load_model(
-    #     "sentence_prediction/trained/" + "tf/saved_model"
-    # )
+    """
+    Loads a TFSMLayer model from the specified path, returning the model object.
+    """
+    # ### Janis Rubins - Step 5.1: Log function entry
+    logging.info("Entering load_model function.")
+    start_time = time.time()
+    log_resource_usage()
+
+    model = None
+    model_path = "sentence_prediction/trained/tf/saved_model"
+
+    try:
+        # ### Janis Rubins - Step 5.2: Attempt to load the model
+        logging.info(f"Attempting to load model from: {model_path}")
+        model = keras.layers.TFSMLayer(model_path, call_endpoint="serving_default")
+        logging.info("Model loaded successfully.")
+
+    except Exception as e:
+        # ### Janis Rubins - Step 5.3: Log error with stack trace
+        logging.error(f"Error loading model from '{model_path}': {e}")
+        traceback.print_exc()
+
+    finally:
+        # ### Janis Rubins - Step 5.4: Log performance and resource usage
+        end_time = time.time()
+        duration = end_time - start_time
+        logging.info(f"load_model completed in {duration:.2f}s")
+        log_resource_usage()
+        logging.info("Exiting load_model function.")
 
     return model
