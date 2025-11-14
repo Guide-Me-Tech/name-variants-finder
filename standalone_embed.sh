@@ -33,6 +33,7 @@ EOF
         --name milvus-standalone \
         --net consultant_ai \
         -d \
+	--restart unless-stopped \
         --security-opt seccomp:unconfined \
         -e ETCD_USE_EMBED=true \
         -e ETCD_DATA_DIR=/var/lib/milvus/etcd \
